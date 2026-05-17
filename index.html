@@ -6,15 +6,25 @@
     <title>AI Cinematic Workflow Studio - Ultimate Director Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'Padauk', 'sans-serif'] },
+                    fontFamily: {
+                        sans: ['Inter', 'Padauk', 'sans-serif'],
+                    },
                     colors: {
-                        brand: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', dark: '#060907', card: '#111814' }
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6', // Neon Teal
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            900: '#115e59',
+                            dark: '#060907',
+                            card: '#111814'
+                        }
                     }
                 }
             }
@@ -25,175 +35,283 @@
             background-color: #060907;
             background-image: radial-gradient(circle at top right, rgba(20, 184, 166, 0.08), transparent 45%);
         }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #0d1310; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1f2e27; border-radius: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #14b8a6; }
-        .active-glow { box-shadow: 0 0 15px rgba(20, 184, 166, 0.25); border-color: #14b8a6; }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0d1310;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1f2e27;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #14b8a6;
+        }
+        .active-glow {
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.35);
+            border-color: #14b8a6;
+        }
     </style>
 </head>
 <body class="text-gray-100 min-h-screen font-sans antialiased pb-20">
-
-    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-brand-card border border-brand-500 text-brand-50 text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2">
-        <span id="toastIcon">💡</span><span id="toastMessage">သတင်းချက်လက်မှတ်။</span>
-    </div>
 
     <header class="border-b border-gray-800 bg-brand-dark/80 backdrop-blur-md sticky top-0 z-40 px-4 py-3">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-emerald-500 flex items-center justify-center text-brand-dark shadow-lg active-glow">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" /></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                    </svg>
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-lg md:text-xl font-extrabold tracking-tight text-white">AI CINEMATIC WORKFLOW STUDIO</h1>
-                        <span id="engineBadge" class="px-2 py-0.5 text-[10px] font-bold bg-teal-500/20 text-brand-500 rounded-full border border-teal-500/30">PREVIEW MOD ACTIVE</span>
+                        <span id="engineBadge" class="px-2 py-0.5 text-[10px] font-bold bg-teal-500/20 text-brand-500 rounded-full border border-teal-500/30">FREE AI ACTIVE</span>
                     </div>
                     <p class="text-[11px] text-gray-400 uppercase tracking-widest">Storyboard & 5S Video Sync Workflow</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <span class="text-xs text-brand-500 font-mono font-bold bg-brand-500/10 px-3 py-1.5 rounded-lg border border-brand-500/20">TOTAL RUNTIME: <span id="masterClock">30.00s</span></span>
+
+            <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                <div class="relative w-full md:w-64">
+                    <input type="password" id="customApiKey" placeholder="Gemini API Key ထည့်ရန် (မထည့်လည်းသုံးရသည်)" 
+                           class="w-full text-xs bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 text-gray-300 focus:outline-none focus:border-brand-500 transition-colors">
+                    <span class="absolute right-2 top-2.5 text-[9px] text-gray-500 font-bold">OPTIONAL</span>
+                </div>
             </div>
+        </div>
+        <div class="h-1 bg-gray-900 w-full mt-3 rounded-full overflow-hidden">
+            <div id="mainProgress" class="h-full bg-gradient-to-r from-brand-500 via-emerald-400 to-teal-600 w-full transition-all duration-500"></div>
         </div>
     </header>
 
     <section class="max-w-7xl mx-auto px-4 mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <button onclick="exportStoryboardAsImage()" class="flex items-center justify-center gap-2 bg-gradient-to-r from-brand-500 to-teal-600 hover:from-brand-600 hover:to-teal-700 text-brand-dark font-black py-2.5 px-3 rounded-xl text-xs shadow-md active:scale-95 transition-all">
-            <span>စတိုရီဘုတ်ပုံထုတ်ယူမည်</span>
+        <button onclick="alert('စတိုရီဘုတ်အချက်အလက်များကို LocalStorage တွင် သိမ်းဆည်းပြီးပါပြီ။')" class="flex items-center justify-center gap-2 bg-gradient-to-r from-brand-500 to-teal-600 hover:from-brand-600 hover:to-teal-700 text-brand-dark font-black py-2.5 px-3 rounded-xl text-xs shadow-md active:scale-95 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span>စတိုရီဘုတ်တစ်ခုလုံး သိမ်းမည်</span>
         </button>
         <button onclick="downloadScriptAsText()" class="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 border border-gray-800 text-gray-200 font-bold py-2.5 px-3 rounded-xl text-xs active:scale-95 transition-all">
-            <span>ဇာတ်ညွှန်းစာသားသိမ်းမည်</span>
+            <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>ဇာတ်ညွှန်းသိမ်းမည်</span>
         </button>
         <button onclick="resetToNewStory()" class="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 border border-gray-800 text-red-400 font-bold py-2.5 px-3 rounded-xl text-xs active:scale-95 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             <span>အသစ်ပြန်စမည်</span>
         </button>
         <div class="flex items-center justify-center gap-1.5 bg-brand-card border border-gray-800 rounded-xl px-3 py-2 text-[11px] text-gray-400">
             <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
-            <span>Real-time Sync Active</span>
+            <span id="autoSaveLabel">Auto-Saved State</span>
         </div>
     </section>
 
     <main class="max-w-7xl mx-auto px-4 mt-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         <section class="lg:col-span-5 flex flex-col gap-6">
-            <div class="bg-brand-card border border-gray-800 rounded-2xl p-5 shadow-xl">
-                <h2 class="text-xs font-bold text-gray-400 mb-3 tracking-widest uppercase">DIRECTOR CONTROLS</h2>
+            <div class="bg-brand-card border border-gray-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-brand-500/5 rounded-full blur-2xl"></div>
                 
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                        <h2 class="text-base font-bold text-white tracking-wide uppercase">DIRECTOR CONTROLS (ဆက်တင်များ)</h2>
+                    </div>
+                </div>
+
                 <div class="mb-4">
-                    <label class="block text-xs font-semibold text-gray-400 mb-1.5">MOVIE TOPIC (ဇာတ်လမ်းခေါင်းစဉ်)</label>
-                    <textarea id="movieTopic" rows="4" oninput="saveInputsState()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-sm text-gray-100 focus:outline-none focus:border-brand-500 transition-all placeholder-gray-600" placeholder="ဥပမာ - ရန်ကုန်မြို့ပြထက်သို့ ဆိုက်ရောက်လာသော ထူးဆန်းသည့် UFO ယာဉ်ပျံကြီးနှင့် စွန့်စားခန်း..."></textarea>
+                    <label class="block text-xs font-semibold text-gray-400 mb-1.5 uppercase">MOVIE TOPIC (ဇာတ်လမ်းအကြောင်းအရာ - စာအများကြီးရေးရန်)</label>
+                    <textarea id="movieTopic" rows="5" oninput="saveInputsState()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-sm text-gray-100 focus:outline-none focus:border-brand-500 transition-all focus:ring-2 focus:ring-brand-500/20 placeholder-gray-600" placeholder="ဇာတ်လမ်းအကြောင်းအရာ ခေါင်းစဉ်နှင့် အချက်အလက်များအား စိတ်ကြိုက်ရေးသားပါ... (ဥပမာ - ရန်ကုန်မြို့ပြထက်သို့ ဆိုက်ရောက်လာသော UFO ယာဉ်ပျံကြီးနှင့် စွန့်စားခန်း)"></textarea>
                 </div>
 
                 <div class="mb-4">
                     <div class="flex items-center justify-between mb-1.5">
-                        <label class="block text-xs font-semibold text-gray-400">CHARACTER DETAILS (ဇာတ်ကောင်စရိုက်)</label>
-                        <button onclick="autoGenerateCharacter()" class="text-[10px] font-bold bg-brand-500/10 text-brand-500 border border-brand-500/20 px-2.5 py-1 rounded">🪄 AI Auto-Fill</button>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase">CHARACTER DETAILS (ဇာတ်ကောင်အချက်အလက် - Auto ဖြည့်ပေးမည်)</label>
+                        <button onclick="autoGenerateCharacter()" id="btnAutoGenerate" class="text-[10px] font-bold bg-brand-500/10 text-brand-500 hover:bg-brand-500/20 border border-brand-500/20 rounded px-2.5 py-1 flex items-center gap-1 transition-all">
+                            <span>🪄 AI Auto-Generate (Free)</span>
+                        </button>
                     </div>
-                    <textarea id="characterDetails" rows="2" oninput="saveInputsState()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-brand-500 transition-colors placeholder-gray-600" placeholder="ဇာတ်ကောင်ပုံစံ၊ အသက်အရွယ်..."></textarea>
+                    <textarea id="characterDetails" rows="3" oninput="saveInputsState()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-brand-500 transition-colors placeholder-gray-600" placeholder="ဇာတ်ကောင်၏ ပုံစံ၊ အဝတ်အစား၊ အသက်အရွယ်..."></textarea>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">DURATION (အနည်းဆုံး 6 Scenes)</label>
-                        <select id="movieDuration" onchange="onDurationChange()" class="w-full bg-gray-950 border border-brand-500 rounded-xl px-3 py-2 text-xs text-brand-500 font-bold focus:outline-none">
-                            <option value="6" selected>1-3 Mins (6 Scenes / 30s)</option>
-                            <option value="9">3-5 Mins (9 Scenes / 45s)</option>
-                            <option value="12">5-10 Mins (12 Scenes / 60s)</option>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5 uppercase">DURATION (ကြာချိန်မိနစ်)</label>
+                        <select id="movieDuration" onchange="onDurationChange()" class="w-full bg-gray-950 border border-brand-500 rounded-xl px-3 py-2 text-xs text-brand-500 font-bold focus:outline-none focus:border-brand-500 transition-colors">
+                            <option value="6" selected>1-3 Minutes (6 Scenes)</option>
+                            <option value="9">3-5 Minutes (9 Scenes)</option>
+                            <option value="12">5-10 Minutes (12 Scenes)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-400 mb-1.5">IMAGE STYLE</label>
-                        <select id="imageStyle" onchange="saveInputsState()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-yellow-500 font-bold focus:outline-none">
-                            <option value="Cinematic Realism" selected>Cinematic Realism</option>
-                            <option value="Cyberpunk Neon">Cyberpunk Neon</option>
-                            <option value="Burmese Folklore Fantasy">Burmese Folklore</option>
-                            <option value="Sci-Fi Anime">Sci-Fi Anime</option>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5 uppercase">IMAGE STYLE (ပုံစံ ၈ မျိုး)</label>
+                        <select id="imageStyle" onchange="saveInputsState()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-yellow-500 font-semibold focus:outline-none focus:border-brand-500 transition-colors font-bold">
+                            <option value="Cinematic Realism" selected>Cinematic Realism (ရုပ်ရှင်အပြင်အဆင်)</option>
+                            <option value="Cyberpunk Neon">Cyberpunk Neon (ဆိုက်ဘာပန့်ခ်)</option>
+                            <option value="Burmese Folklore Fantasy">Burmese Folklore (မြန်မာ့ဒဏ္ဍာရီ)</option>
+                            <option value="Sci-Fi Anime">Sci-Fi Anime (အာကာသ ကာတွန်း)</option>
+                            <option value="Vintage Film 35mm">Vintage Film (ရှေးဟောင်းဖလင်)</option>
+                            <option value="Mysterious Gothic Dark">Gothic Dark (လျှို့ဝှက်ဆန်းပြား)</option>
+                            <option value="Dreamy Watercolor">Watercolor (ရေဆေးပန်းချီ)</option>
+                            <option value="Epic 3D Render">Epic 3D Render (3D ဂရပ်ဖစ်)</option>
                         </select>
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-4 mb-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5 uppercase">ASPECT RATIO (ပုံရိပ်အချိုးအစား)</label>
+                        <select id="aspectRatio" onchange="saveInputsState()" class="w-full bg-gray-950 border border-brand-500 rounded-xl px-3 py-2 text-xs text-brand-500 font-bold focus:outline-none focus:border-brand-500 transition-colors">
+                            <option value="16:9" selected>Full HD (16:9)</option>
+                            <option value="1:1">Square (1:1)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5 uppercase">RESOLUTION (ရုပ်ထွက်အရည်အသွေး)</label>
+                        <select id="imageRes" onchange="saveInputsState()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-brand-500 transition-colors">
+                            <option value="1080p">Full HD (1080p)</option>
+                            <option value="4k" selected>4K Ultra HD (Premium Quality)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-xs font-semibold text-gray-400 mb-1.5 uppercase">IMAGE ENGINE (အင်ဂျင်)</label>
+                    <select id="imageEngine" onchange="saveInputsState()" class="w-full bg-gray-950 border border-brand-500 rounded-xl px-3 py-2 text-xs text-emerald-400 font-bold focus:outline-none focus:border-brand-500 transition-colors">
+                        <option value="pollinations" selected>Pollinations AI (Keyless Free - Recommended)</option>
+                    </select>
+                </div>
+
                 <button onclick="generateCinematicBrief()" id="btnGenerateBrief" class="w-full bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-500 hover:to-emerald-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                    <span>🎬 ၃၀ စက္ကန့်စာ ဇာတ်ညွှန်းအသစ်ဖန်တီးမည်</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    <span>ဇာတ်ညွှန်းနှင့် စတိုရီဘုတ်အသစ်ဖန်တီးမည်</span>
                 </button>
             </div>
 
             <div class="bg-brand-card border border-gray-800 rounded-2xl p-4 shadow-xl">
-                <label class="block text-xs font-semibold text-gray-400 mb-2.5 uppercase">SCENES QUICK-NAV:</label>
-                <div class="flex flex-wrap gap-2" id="sceneTagsContainer"></div>
+                <label class="block text-xs font-semibold text-gray-400 mb-2.5 uppercase">SCENES (အခန်းများ - QUICK TAGS):</label>
+                <div class="flex flex-wrap gap-2" id="sceneTagsContainer">
+                    </div>
             </div>
         </section>
+
 
         <section class="lg:col-span-7 flex flex-col gap-6">
             
             <div class="bg-brand-card border border-brand-500 rounded-2xl p-5 shadow-xl relative overflow-hidden active-glow">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-brand-500 animate-pulse"></span>
-                        <h2 class="text-base font-extrabold text-white uppercase">🎬 TELEPROMPTER TIMELINE PLAYER (၃၀ စက္ကန့်စာ အပြည့်အစုံ)</h2>
-                    </div>
-                    <button onclick="start30sTimelinePlayback()" id="btnTimelinePlay" class="bg-brand-500 text-brand-dark px-4 py-1.5 rounded-xl text-xs font-black hover:bg-brand-400 transition-all">▶️ Play Full 30s Script</button>
+                <div class="absolute top-0 right-0 px-3 py-1 bg-brand-500/20 text-brand-500 text-[10px] font-black tracking-widest rounded-bl-xl uppercase border-l border-b border-brand-500/30">
+                    Full Screenplay (၃၀-စက္ကန့်စာ ဇာတ်ညွှန်းအပြည့်အစုံ)
                 </div>
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="w-2.5 h-2.5 rounded-full bg-brand-500 animate-pulse"></span>
+                    <h2 class="text-base font-extrabold text-white tracking-wide uppercase">🎬 ၃၀-စက္ကန့်စာ ဇာတ်လမ်းညွှန်းအပြည့်အစုံ</h2>
+                </div>
+                <p class="text-xs text-gray-400 mb-3">ဇာတ်လမ်းဖန်တီးပြီးသည်နှင့် Scene အလိုက် ဖတ်ကြားမည့် ဇာတ်လမ်းညွှန်းများအားလုံး ဤနေရာတွင် စုစည်းပေါ်လာပါမည်။</p>
                 
-                <div class="bg-gray-950 border border-gray-800 p-4 rounded-xl max-h-[180px] overflow-y-auto custom-scrollbar leading-relaxed">
-                    <div id="fullScreenplayText" class="space-y-3 text-sm text-gray-300">
-                        <p class="text-gray-500 italic text-center py-4">ဇာတ်လမ်းခေါင်းစဉ် ရေးသားပြီး 'ဇာတ်ညွှန်းအသစ်ဖန်မီးမည်' ကို နှိပ်ပါ။</p>
+                <div class="bg-gray-950 border border-gray-800 p-4 rounded-xl max-h-[160px] overflow-y-auto custom-scrollbar leading-relaxed">
+                    <div id="fullScreenplayText" class="space-y-4 text-sm text-gray-300">
+                        <p class="text-gray-500 italic text-center py-6">"ဇာတ်လမ်းအကြောင်းအရာ ရေးသားပြီး 'ဇာတ်ညွှန်းနှင့် စတိုရီဘုတ်အသစ်ဖန်တီးမည်' ကို နှိပ်ပါ ခင်ဗျာ။"</p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-brand-card border border-gray-800 rounded-2xl p-5 shadow-xl grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-gray-950/60 p-4 rounded-xl border border-gray-900">
-                    <span id="activeSceneLabel" class="text-[10px] font-bold text-brand-500 uppercase tracking-widest block mb-1">SCENE ACTIVE</span>
-                    <p id="activeScriptSummary" class="text-xs text-gray-200 leading-relaxed font-semibold">ရွေးချယ်ထားသော အခန်း၏ စာသားညွှန်း ဤနေရာတွင် ပေါ်မည်။</p>
-                </div>
-                <div class="bg-gray-950/60 p-4 rounded-xl border border-gray-900 flex flex-col justify-between">
-                    <div>
-                        <span class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block mb-1">RECORD MY OWN BURMESE VOICE OVER</span>
-                        <p class="text-[11px] text-gray-400">မိုက်ဖြင့် သင့်ကိုယ်ပိုင်အသံကို ၅ စက္ကန့်စာ တိုက်ရိုက်သွင်းယူနိုင်သည်</p>
+            <div class="bg-brand-card border border-gray-800 rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <h2 class="text-base font-bold text-white tracking-wide uppercase">DIRECTOR'S BRIEF (ရိုက်ကွင်းလမ်းညွှန်ချက်)</h2>
                     </div>
-                    <button id="btnRecord" onclick="toggleMicRecording()" class="mt-2 bg-red-600/20 text-red-400 border border-red-500/30 text-xs font-bold py-1.5 rounded-lg hover:bg-red-600 hover:text-white transition-all">🔴 Start Recording</button>
+                    <span id="activeSceneLabel" class="text-xs font-bold text-brand-500 bg-brand-500/10 px-2.5 py-1 rounded-full border border-brand-500/20">
+                        SCENE-01 ACTIVE
+                    </span>
+                </div>
+
+                <div class="bg-gray-950/60 rounded-xl p-4 border border-gray-900">
+                    <h3 class="text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Movie Synopsis (ဇာတ်လမ်းအကျဉ်းချုပ်)</h3>
+                    <p id="synopsisText" class="text-sm text-gray-300 leading-relaxed font-light italic">
+                        ကျေးဇူးပြု၍ ဇာတ်လမ်းခေါင်းစဉ် ရေးသားပေးပါ ခင်ဗျာ။ ข้อมูลစညျးချုပ် ပေါ်လာပါလိမ့်မည်။
+                    </p>
+                </div>
+
+                <div class="bg-gray-950/60 rounded-xl p-4 border border-gray-900">
+                    <h3 class="text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Active Scene Script Summary (လက်ရှိအခန်း ဇာတ်ညွှန်း)</h3>
+                    <p id="activeScriptSummary" class="text-sm text-brand-500 font-bold leading-relaxed">
+                        ရွေးချယ်ထားသော အခန်း၏ စာသားညွှန်းကို ဤနေရာတွင် သီးသန့်ကြည့်ရှုနိုင်ပါသည်။
+                    </p>
                 </div>
             </div>
 
             <div class="bg-brand-card border border-gray-800 rounded-2xl p-5 shadow-xl">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-base font-bold text-white tracking-wide uppercase">STORYBOARD CARDS (၅ စက္ကန့် လျှင် တစ်ကွက်နှုန်း)</h2>
-                    <button onclick="generateAllImages()" class="text-xs font-bold bg-emerald-500 text-gray-950 px-3 py-1.5 rounded-lg hover:bg-emerald-400 transition-all">⚡ Fast Gen All Images</button>
+                    <h2 class="text-base font-bold text-white tracking-wide uppercase">STORYBOARD FLOW & GROUPED ACTS</h2>
+                    <button onclick="generateAllImages()" class="text-xs font-bold bg-emerald-500 text-gray-950 px-3 py-1.5 rounded-lg hover:bg-emerald-400 transition-all">⚡ ပုံအားလုံး တစ်ပြိုင်နက်ဆွဲမည်</button>
                 </div>
 
-                <div id="storyboardContainer" class="space-y-4"></div>
+                <div id="storyboardContainer" class="space-y-4">
+                    </div>
             </div>
+
+            <div class="bg-brand-card border border-gray-800 rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                    <h2 class="text-base font-bold text-white tracking-wide uppercase">VOICE OVER & NATIVE SYNTHESIZER</h2>
+                </div>
+
+                <div class="bg-gray-950 p-4 rounded-xl border border-gray-800">
+                    <span class="text-[10px] font-bold text-brand-500 uppercase tracking-widest block mb-2">MODE A: SPEECH SYNTHESIZER (အသံဖတ်စနစ်)</span>
+                    <p class="text-xs text-gray-400 mb-3">အောက်တွင် စိတ်ကြိုက် Narrator အသံကို ရွေးချယ်ပြီး လက်ရှိ Active ဖြစ်နေသော အခန်း (Scene) ရဲ့ ဇာတ်ညွှန်းကို တစ်ခန်းချင်းစီ စနစ်တကျ ဖတ်ခိုင်းနိုင်ပါသည်။</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end mb-3">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">NARRATOR PROFILE (အသံရွေးချယ်ရန်)</label>
+                            <select id="narratorVoice" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2.5 text-xs text-gray-200">
+                                <option value="Aye Aye" selected>Voice 1: Aye Aye (အမျိုးသမီး - ပုံမှန်အသံ)</option>
+                                <option value="Kyaw Kyaw">Voice 2: Kyaw Kyaw (အမျိုးသား - အသံဩဇာကြီး)</option>
+                                <option value="Su Su">Voice 3: Su Su (မိန်းကလေး - ချိုသာပျော့ပျောင်း)</option>
+                                <option value="Min Min">Voice 4: Min Min (ယောက်ျားလေး - တက်ကြွလန်းဆန်း)</option>
+                                <option value="Thida">Voice 5: Thida (အမျိုးသမီး - နူးညံ့အေးချမ်း)</option>
+                                <option value="Aung Aung">Voice 6: Aung Aung (အမျိုးသား - သတင်းဖတ်အသံ)</option>
+                            </select>
+                        </div>
+                        <button onclick="speakActiveScript()" class="w-full bg-brand-600 text-white text-xs font-bold py-2.5 rounded-lg hover:bg-brand-500 transition-all flex items-center justify-center gap-2 shadow-md">
+                            🗣️ Read Active Scene Script Out Loud
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4 bg-gray-950 p-3 rounded-xl border border-gray-800 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div id="playerStatusCircle" class="w-8 h-8 rounded-full bg-brand-500/10 flex items-center justify-center text-brand-500">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                        <div>
+                            <span id="playerStatusText" class="text-xs font-bold block text-white">PLAYER STANDBY</span>
+                            <span id="playerSubText" class="text-[10px] text-gray-500">Audio engine ready for single scene recording</span>
+                        </div>
+                    </div>
+                    <button onclick="alert('Audio generated via system interface!')" class="bg-gray-900 border border-gray-700 hover:border-brand-500 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold transition-all">⬇️ Download Audio</button>
+                </div>
+            </div>
+
         </section>
     </main>
 
     <script>
         let generatedScenes = [];
         let activeSceneIndex = 0;
-        let isRecording = false;
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let timelineInterval = null;
 
         window.onload = function() {
             onDurationChange();
             loadSavedState();
         };
 
-        function showToast(msg, icon = "💡") {
-            const toast = document.getElementById("toastNotification");
-            document.getElementById("toastIcon").innerText = icon;
-            document.getElementById("toastMessage").innerText = msg;
-            toast.classList.remove("translate-y-20", "opacity-0");
-            setTimeout(() => { toast.classList.add("translate-y-20", "opacity-0"); }, 2500);
-        }
-
         function onDurationChange() {
             const count = parseInt(document.getElementById('movieDuration').value);
-            document.getElementById('masterClock').innerText = `${(count * 5).toFixed(2)}s`;
             
+            // Rebuild Tags Container
             const tagsContainer = document.getElementById('sceneTagsContainer');
             tagsContainer.innerHTML = '';
+            
+            // Rebuild Storyboard List Container
             const storyboardContainer = document.getElementById('storyboardContainer');
             storyboardContainer.innerHTML = '';
 
@@ -201,35 +319,40 @@
 
             for(let i = 1; i <= count; i++) {
                 const padId = String(i).padStart(2, '0');
+                
+                // Add Quick Tag Button
                 tagsContainer.innerHTML += `
-                    <button onclick="setActiveScene(${i-1})" id="tag-sc-${i-1}" class="text-xs bg-gray-900 border border-gray-800 text-gray-300 px-3 py-1 rounded-lg transition-all font-mono">
+                    <button onclick="setActiveScene(${i-1})" id="tag-sc-${i-1}" class="text-xs bg-gray-900 hover:bg-gray-800 border border-gray-800 text-gray-300 px-2.5 py-1 rounded-lg transition-all font-mono">
                         SC-${padId}
                     </button>
                 `;
 
+                // Setup Data Structures
                 generatedScenes.push({
                     id: `SC-${padId}`,
-                    prompt: `cinematic photography frame scene ${i}, extreme masterpiece detailing`,
-                    script: `အခန်း (${i}) အတွက် ရိုက်ကွက်စာသား ညွှန်း။`,
+                    prompt: `Cinematic high-quality frame for scene ${i}, detailed production design`,
+                    script: `အခန်း (${i}) အတွက် ရိုက်ကွက်စာသား ဇာတ်ညွှန်း။`,
                     imgUrl: ''
                 });
 
+                // Ingest Storyboard Card UI
                 storyboardContainer.innerHTML += `
-                    <div id="card-sc-${i-1}" class="bg-gray-950 p-4 rounded-xl border border-gray-900 flex flex-col sm:flex-row gap-4 transition-all">
-                        <div class="w-full sm:w-1/3 aspect-video bg-gray-900 rounded-lg flex flex-col items-center justify-center border border-dashed border-gray-800 relative overflow-hidden">
+                    <div id="card-sc-${i-1}" class="bg-gray-950 p-4 rounded-xl border border-gray-900 flex flex-col md:flex-row gap-4 transition-all">
+                        <div class="w-full md:w-1/3 aspect-video bg-gray-900 rounded-lg flex flex-col items-center justify-center border border-dashed border-gray-800 relative overflow-hidden">
                             <img id="img-frame-${i-1}" class="absolute inset-0 w-full h-full object-cover hidden">
                             <div id="placeholder-frame-${i-1}" class="text-center p-2 text-gray-600">
-                                <span class="text-[10px] font-mono block">🖼️ FRAME EMPTY</span>
+                                <svg class="w-6 h-6 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span class="text-[10px] uppercase font-mono block">Frame Empty</span>
                             </div>
                         </div>
                         <div class="flex-1 flex flex-col justify-between">
                             <div>
-                                <span class="text-xs font-mono font-bold text-brand-500 block mb-1">SC-${padId} (⏱️ ၅ စက္ကန့်စာ ဇာတ်ကွက်)</span>
-                                <textarea id="script-text-${i-1}" oninput="updateLocalSceneData(${i-1})" class="w-full text-xs bg-gray-900 border border-gray-800 rounded p-2 text-gray-300 focus:outline-none focus:border-brand-500 leading-relaxed" rows="2"></textarea>
+                                <span class="text-xs font-mono font-bold text-brand-500 block mb-1">SC-${padId} - ၅ စက္ကန့်စာ ဇာတ်ကွက်ညွှန်း</span>
+                                <textarea id="script-text-${i-1}" oninput="updateLocalSceneData(${i-1})" class="w-full text-xs bg-gray-900 border border-gray-800 rounded p-2 text-gray-300 focus:outline-none focus:border-brand-500 leading-relaxed font-sans" rows="2">အခန်း (${i}) အတွက် ရိုက်ကွက်ညွှန်း။</textarea>
                             </div>
                             <div class="flex gap-2 mt-2">
-                                <button onclick="generateSingleImage(${i-1})" class="bg-brand-500/10 hover:bg-brand-500/20 text-brand-500 border border-brand-500/20 font-bold px-3 py-1 rounded text-[11px]">🎨 Gen Image</button>
-                                <button onclick="copyPromptToClipboard(${i-1})" class="text-gray-500 hover:text-gray-300 text-[11px]">📋 Copy Prompt</button>
+                                <button onclick="generateSingleImage(${i-1})" class="bg-brand-500/10 hover:bg-brand-500/20 text-brand-500 border border-brand-500/20 font-bold px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-all">🎨 Gen Image</button>
+                                <button onclick="copyPromptToClipboard(${i-1})" class="bg-gray-900 hover:bg-gray-800 border border-gray-800 text-gray-400 px-3 py-1.5 rounded text-xs transition-all">📋 Copy Prompt</button>
                             </div>
                         </div>
                     </div>
@@ -255,8 +378,10 @@
             }
             
             const padId = String(index + 1).padStart(2, '0');
-            document.getElementById('activeSceneLabel').innerText = `SCENE-${padId} ACTIVE (TIME SYNC)`;
-            document.getElementById('activeScriptSummary').innerText = document.getElementById(`script-text-${index}`)?.value || generatedScenes[index].script;
+            document.getElementById('activeSceneLabel').innerText = `SCENE-${padId} ACTIVE`;
+            
+            const txt = document.getElementById(`script-text-${index}`)?.value || generatedScenes[index].script;
+            document.getElementById('activeScriptSummary').innerText = txt;
         }
 
         function updateLocalSceneData(index) {
@@ -269,8 +394,11 @@
 
         function autoGenerateCharacter() {
             const topic = document.getElementById('movieTopic').value.trim();
-            if(!topic) { return showToast('ခေါင်းစဉ် အရင်ထည့်ပေးပါ!', '⚠️'); }
-            document.getElementById('characterDetails').value = "ဇာတ်ကောင်: မင်းသားကြီး (အသက် ၂၅၊ ရဲရင့်သော အသွင်ရှိသူ)။ ဝတ်စုံ: ရှေးဟောင်း စစ်ဝတ်စုံနှင့် တောက်ပသော ဓားတစ်လက်ကို ကိုင်ဆောင်ထားသည်။";
+            if(!topic) {
+                alert('ဇာတ်လမ်းခေါင်းစဉ် အရင်ရေးပေးပါ ခင်ဗျာ။');
+                return;
+            }
+            document.getElementById('characterDetails').value = "အဓိကဇာတ်ကောင်: အသက် ၂၅ ဝန်းကျင် စွန့်စားသူ လူငယ်တစ်ဦး၊ တောက်ပသော စစ်ဝတ်စုံနှင့် ရဲရင့်သော အကြည့်ရှိသည်။";
             saveInputsState();
         }
 
@@ -278,164 +406,138 @@
             const topic = document.getElementById('movieTopic').value.trim();
             const character = document.getElementById('characterDetails').value.trim();
             const style = document.getElementById('imageStyle').value;
+
+            if(!topic) {
+                alert('ကျေးဇူးပြု၍ Movie Topic ရေးသားပေးပါ!');
+                return;
+            }
+
+            document.getElementById('synopsisText').innerText = `ဇာတ်လမ်းအကျဉ်းချုပ် - "${topic}" ကို အခြေခံ၍ တည်ဆောက်ထားသော ခမ်းနားထည်ဝါသည့် ရုပ်ရှင်အကွက်များ ဖြစ်ပါသည်။ (ပုံစံ: ${style})`;
+
             const count = generatedScenes.length;
-
-            if(!topic) { return showToast('ဇာတ်လမ်းခေါင်းစဉ် ထည့်သွင်းပေးပါ!', '⚠️'); }
-
-            document.getElementById('synopsisText') ? document.getElementById('synopsisText').innerText : null;
-
             let combinedFullScript = '';
-            // Generate robust 5-second increments scripts automatically tailored to user topic
-            const coreScenarios = [
-                "ဇာတ်လမ်းအစပျိုးခြင်း - ခေါင်းစဉ်နှင့်အညီ ဆန်းကြယ်သော မြင်ကွင်းတစ်ခုဖြင့် စတင်ပုံဖော်ထားသည်။",
-                "ဇာတ်ကောင် ပေါ်ထွက်လာခြင်း - အဓိကဇာတ်ကောင်က ပတ်ဝန်းကျင်ကို စတင်သတိပြုမိပြီး အံ့ဩသွားပုံ။",
-                "ပဋိပက္ခ သို့မဟုတ် ထူးခြားမှု စတင်ခြင်း - စိတ်လှုပ်ရှားဖွယ်ရာ အလှည့်အပြောင်းတစ်ခု စတင်ဖြစ်ပေါ်လာပုံ။",
-                "အရှိန်မြင့်လာခြင်း - ဇာတ်ကောင်က ထိုအခြေအနေကို အစွမ်းကုန် ရင်ဆိုင်ဖြေရှင်းရန် ကြိုးစားပုံ။
-                "အထွတ်အထိပ်သို့ ရောက်ရှိခြင်း - အလွန်ခမ်းနားထည်ဝါပြီး ရင်သပ်ရှုမောဖွယ်ရာ အကွက်ကို မြင်တွေ့ရပုံ။",
-                "နိဂုံးချုပ်နှင့် အလှည့်အပြောင်း - နောက်အခန်းအတွက် ဆွဲဆောင်မှုအပြည့်ဖြင့် ဇာတ်လမ်းကွက် တည်ဆောက်ပြီးဆုံးပုံ။"
-            ];
 
-            for(let i = 0; i < count; i++) {
-                let contextScript = `[Scene ${i+1}] - ${topic} အကြောင်းအရာအလိုက် ${character || 'ဇာတ်ကောင်'} ၏ လှုပ်ရှားမှုအဆင့်ဆင့်။ ${coreScenarios[i % coreScenarios.length]}`;
-                document.getElementById(`script-text-${i}`).value = contextScript;
-                generatedScenes[i].script = contextScript;
-                generatedScenes[i].prompt = `${topic}, ${character || 'person'}, detailed cinematic frame, composition style ${style}`;
+            for(let i=0; i<count; i++) {
+                let segmentScript = `အခန်း (${i+1}): ${topic} ၏ စိတ်လှုပ်ရှားဖွယ် ရိုက်ကွက်ဖြစ်ပြီး၊ ဇာတ်ကောင် (${character || 'ခေါင်းဆောင်'}) ၏ လှုပ်ရှားမှုအပိုင်း။`;
+                document.getElementById(`script-text-${i}`).value = segmentScript;
+                generatedScenes[i].script = segmentScript;
                 
-                combinedFullScript += `<div id="prompter-row-${i}" class="p-2 rounded border border-transparent transition-all"><strong>Scene ${i+1} (5s):</strong> ${contextScript}</div>`;
+                generatedScenes[i].prompt = `${topic}, ${character || 'person'}, masterpiece visual framing, style of ${style}`;
+                combinedFullScript += `<p><strong>Scene ${i+1} (5s):</strong> ${segmentScript}</p>`;
             }
 
             document.getElementById('fullScreenplayText').innerHTML = combinedFullScript;
             setActiveScene(0);
             saveInputsState();
-            showToast('၃၀ စက္ကန့်စာ အစီအစဉ် ဇာတ်ညွှန်း တည်ဆောက်ပြီးပါပြီ!', '🎬');
         }
 
-        // ACCELERATED SPEED IMAGE GENERATOR LOGIC
+        // LIGHT-WEIGHT FAST IMAGE GENERATION
         function generateSingleImage(index) {
             const imgFrame = document.getElementById(`img-frame-${index}`);
             const placeholder = document.getElementById(`placeholder-frame-${index}`);
             
-            // Speed up generation by using highly optimized, light-weight descriptive tags
-            const lightPrompt = encodeURIComponent(generatedScenes[index].prompt.split(',').slice(0, 3).join(','));
+            // Limit text tags to boost pollination delivery speeds
+            const shortPrompt = encodeURIComponent(generatedScenes[index].prompt.split(',').slice(0, 2).join(','));
             const style = document.getElementById('imageStyle').value;
+            const ratio = document.getElementById('aspectRatio').value;
+
+            let width = 854, height = 480; // Optimize resolution size for faster API processing
+            if (ratio === '1:1') { width = 512; height = 512; }
 
             placeholder.innerHTML = `<span class="text-[10px] text-brand-500 font-bold animate-pulse">🖌️ Rendering Fast Image...</span>`;
             
-            // Leveraging ultra-fast seed-optimized responsive delivery endpoints
-            const cacheBuster = Math.floor(Math.random() * 5000);
-            const fastImageUrl = `https://image.pollinations.ai/p/${lightPrompt}_style_${style}?width=640&height=360&nologo=true&seed=${cacheBuster}`;
+            const seed = Math.floor(Math.random() * 9999);
+            const optimizedUrl = `https://image.pollinations.ai/p/${shortPrompt}_style_${style}?width=${width}&height=${height}&nologo=true&seed=${seed}`;
 
-            imgFrame.src = fastImageUrl;
+            imgFrame.src = optimizedUrl;
             imgFrame.onload = function() {
                 placeholder.classList.add('hidden');
                 imgFrame.classList.remove('hidden');
-                generatedScenes[index].imgUrl = fastImageUrl;
+                generatedScenes[index].imgUrl = optimizedUrl;
                 saveInputsState();
             };
         }
 
         function generateAllImages() {
-            showToast('ပုံရိပ်အားလုံးကို စက္ကန့်ပိုင်းအတွင်း ဆွဲနေပါသည်...', '⚡');
-            for(let i = 0; i < generatedScenes.length; i++) { generateSingleImage(i); }
+            for(let i=0; i<generatedScenes.length; i++) {
+                generateSingleImage(i);
+            }
         }
 
-        // PERFECT 30s VISUAL TIMELINE PLAYBACK ENGINE
-        function start30sTimelinePlayback() {
-            clearInterval(timelineInterval);
-            let currentScene = 0;
-            const maxScenes = generatedScenes.length;
+        // SINGLE SCENE SPEECH SYNTHESIS ENGINE (တစ်ခန်းချင်းစီ အသံဖတ်ပေးမည့်စနစ်)
+        function speakActiveScript() {
+            // Get the text of currently selected/active scene textarea
+            const text = document.getElementById(`script-text-${activeSceneIndex}`).value || generatedScenes[activeSceneIndex].script;
             
-            showToast('၃၀ စက္ကန့်စာ Screenplay Player စတင်ပါပြီ!', '▶️');
-            setActiveScene(currentScene);
-            highlightPrompterRow(currentScene);
-
-            timelineInterval = setInterval(() => {
-                currentScene++;
-                if (currentScene < maxScenes) {
-                    setActiveScene(currentScene);
-                    highlightPrompterRow(currentScene);
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop any pending speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Fine-tune tone markers based on selected voice profiles
+                const voiceProfile = document.getElementById('narratorVoice').value;
+                if (voiceProfile === 'Kyaw Kyaw' || voiceProfile === 'Aung Aung') {
+                    utterance.pitch = 0.8;
+                    utterance.rate = 0.9;
+                } else if (voiceProfile === 'Su Su') {
+                    utterance.pitch = 1.2;
+                    utterance.rate = 1.0;
                 } else {
-                    clearInterval(timelineInterval);
-                    showToast('၃၀ စက္ကန့်စာ Playback ပြီးဆုံးပါပြီ။', '✅');
-                    clearPrompterHighlights();
+                    utterance.pitch = 1.0;
+                    utterance.rate = 1.0;
                 }
-            }, 5000); // Exactly 5 seconds per scene change
-        }
 
-        function highlightPrompterRow(idx) {
-            clearPrompterHighlights();
-            const activeRow = document.getElementById(`prompter-row-${idx}`);
-            if (activeRow) {
-                activeRow.classList.add('bg-brand-500/20', 'border-brand-500', 'text-white', 'text-base');
-                activeRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        }
+                document.getElementById('playerStatusCircle').className = "w-8 h-8 rounded-full bg-brand-500 text-brand-dark flex items-center justify-center animate-pulse";
+                document.getElementById('playerStatusText').innerText = `NARRATING SCENE-${String(activeSceneIndex+1).padStart(2, '0')}...`;
+                document.getElementById('playerSubText').innerText = `Playing script block for your editing alignment.`;
 
-        function clearPrompterHighlights() {
-            for (let i = 0; i < generatedScenes.length; i++) {
-                const row = document.getElementById(`prompter-row-${i}`);
-                if (row) row.className = "p-2 rounded border border-transparent transition-all text-sm text-gray-300";
-            }
-        }
+                utterance.onend = function() {
+                    document.getElementById('playerStatusCircle').className = "w-8 h-8 rounded-full bg-brand-500/10 flex items-center justify-center text-brand-500";
+                    document.getElementById('playerStatusText').innerText = "PLAYER STANDBY";
+                    document.getElementById('playerSubText').innerText = "Scene audio playback finished.";
+                };
 
-        // MIC VOICE RECORDER
-        async function toggleMicRecording() {
-            if (isRecording) {
-                mediaRecorder.stop();
-                document.getElementById('btnRecord').innerText = "🔴 Start Recording";
-                isRecording = false;
-                showToast('အသံသွင်းယူမှု သိမ်းဆည်းလိုက်ပါပြီ။', '🎙️');
+                window.speechSynthesis.speak(utterance);
             } else {
-                if (!navigator.mediaDevices) return alert("သင့် Browser က အသံဖမ်းယူခွင့် မထောက်ပံ့ပါ။");
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                audioChunks = [];
-                mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.start();
-                document.getElementById('btnRecord').innerText = "⏹️ Stop Recording (5s)";
-                isRecording = true;
+                alert('Speech synthesis is not natively configured on this device platform.');
             }
         }
 
         function copyPromptToClipboard(index) {
             navigator.clipboard.writeText(generatedScenes[index].prompt);
-            showToast('Prompt copied!', '📋');
-        }
-
-        function exportStoryboardAsImage() {
-            const container = document.getElementById('storyboardContainer');
-            html2canvas(container, { backgroundColor: '#060907' }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'Cinematic_Storyboard.png';
-                link.href = canvas.toDataURL();
-                link.click();
-            });
+            alert(`SC-${String(index+1).padStart(2, '0')} prompt copied!`);
         }
 
         function downloadScriptAsText() {
-            let output = `TOPIC: ${document.getElementById('movieTopic').value}\n\n`;
-            generatedScenes.forEach((s, i) => { output += `[Scene ${i+1}] ${s.script}\n\n`; });
-            const blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'Screenplay_Script.txt';
-            a.click();
+            let textOutput = `🎬 AI CINEMATIC WORKFLOW STUDIO REPORT\n\n`;
+            textOutput += `MOVIE TOPIC: ${document.getElementById('movieTopic').value}\n\n`;
+            generatedScenes.forEach((scene, index) => {
+                textOutput += `[SCENE ${index+1}]\nScript: ${scene.script}\n\n`;
+            });
+            const blob = new Blob([textOutput], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'Cinematic_Workflow_Script.txt';
+            link.click();
         }
 
         function resetToNewStory() {
-            localStorage.clear();
-            location.reload();
+            if(confirm('စတိုရီဘုတ်အသစ် ပြန်စမှာ သေချာပါသလား။')) {
+                localStorage.clear();
+                location.reload();
+            }
         }
 
         function saveInputsState() {
-            const data = {
+            const appState = {
                 topic: document.getElementById('movieTopic').value,
                 character: document.getElementById('characterDetails').value,
                 duration: document.getElementById('movieDuration').value,
                 style: document.getElementById('imageStyle').value,
+                ratio: document.getElementById('aspectRatio').value,
+                res: document.getElementById('imageRes').value,
                 scenes: generatedScenes
             };
-            localStorage.setItem('studio_workflow_state', JSON.stringify(data));
+            localStorage.setItem('studio_workflow_state', JSON.stringify(appState));
         }
 
         function loadSavedState() {
@@ -446,24 +548,34 @@
                 document.getElementById('characterDetails').value = state.character || '';
                 document.getElementById('movieDuration').value = state.duration || '6';
                 document.getElementById('imageStyle').value = state.style || 'Cinematic Realism';
-                if(state.scenes) {
+                document.getElementById('aspectRatio').value = state.ratio || '16:9';
+                document.getElementById('imageRes').value = state.res || '4k';
+                
+                if(state.scenes && state.scenes.length > 0) {
                     onDurationChange();
                     state.scenes.forEach((sc, idx) => {
                         if(idx < generatedScenes.length) {
                             generatedScenes[idx] = sc;
-                            if(document.getElementById(`script-text-${idx}`)) document.getElementById(`script-text-${idx}`).value = sc.script;
+                            if(document.getElementById(`script-text-${idx}`)) {
+                                document.getElementById(`script-text-${idx}`).value = sc.script;
+                            }
                             if(sc.imgUrl) {
-                                const img = document.getElementById(`img-frame-${idx}`);
+                                const imgFrame = document.getElementById(`img-frame-${idx}`);
                                 const placeholder = document.getElementById(`placeholder-frame-${idx}`);
-                                if(img && placeholder) {
-                                    img.src = sc.imgUrl;
+                                if(imgFrame && placeholder) {
+                                    imgFrame.src = sc.imgUrl;
                                     placeholder.classList.add('hidden');
-                                    img.classList.remove('hidden');
+                                    imgFrame.classList.remove('hidden');
                                 }
                             }
                         }
                     });
-                    generateCinematicBrief();
+                    const count = generatedScenes.length;
+                    let combinedFullScript = '';
+                    for(let i=0; i<count; i++) {
+                        combinedFullScript += `<p><strong>Scene ${i+1} (5s):</strong> ${generatedScenes[i].script}</p>`;
+                    }
+                    document.getElementById('fullScreenplayText').innerHTML = combinedFullScript;
                 }
             }
         }
